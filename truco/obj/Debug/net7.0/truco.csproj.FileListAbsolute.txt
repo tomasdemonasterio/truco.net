@@ -1,0 +1,15 @@
+C:\Users\Tom\truco\truco\bin\Debug\net7.0\truco.exe
+C:\Users\Tom\truco\truco\bin\Debug\net7.0\truco.deps.json
+C:\Users\Tom\truco\truco\bin\Debug\net7.0\truco.runtimeconfig.json
+C:\Users\Tom\truco\truco\bin\Debug\net7.0\truco.dll
+C:\Users\Tom\truco\truco\bin\Debug\net7.0\truco.pdb
+C:\Users\Tom\truco\truco\obj\Debug\net7.0\truco.csproj.AssemblyReference.cache
+C:\Users\Tom\truco\truco\obj\Debug\net7.0\truco.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Tom\truco\truco\obj\Debug\net7.0\truco.AssemblyInfoInputs.cache
+C:\Users\Tom\truco\truco\obj\Debug\net7.0\truco.AssemblyInfo.cs
+C:\Users\Tom\truco\truco\obj\Debug\net7.0\truco.csproj.CoreCompileInputs.cache
+C:\Users\Tom\truco\truco\obj\Debug\net7.0\truco.dll
+C:\Users\Tom\truco\truco\obj\Debug\net7.0\refint\truco.dll
+C:\Users\Tom\truco\truco\obj\Debug\net7.0\truco.pdb
+C:\Users\Tom\truco\truco\obj\Debug\net7.0\truco.genruntimeconfig.cache
+C:\Users\Tom\truco\truco\obj\Debug\net7.0\ref\truco.dll
