@@ -28,6 +28,8 @@ namespace GameNS {
 
             Round round = new Round(players, deck);
             roundNumber++;
+            round.giveCards();
+            
             round.Start();
         }
 
