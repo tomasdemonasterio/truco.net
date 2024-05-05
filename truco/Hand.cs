@@ -3,22 +3,22 @@ namespace HandNS {
     using DeckNS;
 
     class Hand {
-        private HashSet<Card> cards;
+        private Dictionary<int, Card> cards;
         
         public Hand() {
-            cards = new HashSet<Card>();
+            cards = new Dictionary<int, Card>();
         }
 
-        public void AddCard(Card card) {
-            cards.Add(card);
+        public void AddCard(int index, Card card) {
+            cards.Add(index, card);
         }
 
-        public void removeCard(Card card) {
-            cards.Remove(card);
+        public void removeCard(int index) {
+            cards.Remove(index);
         }
 
-        public HashSet<Card> GetCards() {
-            return cards;
+        public List<Card> GetCards() {
+            return cards.Values.ToList();
         }
     }
 }

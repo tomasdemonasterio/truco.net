@@ -7,6 +7,7 @@ namespace GameNS {
         private List<Player> players;
         private Deck deck;
         private int roundNumber;
+        public Round round { get; set;}
 
         public Game(List<Player> players) {
             this.players = players;
@@ -25,8 +26,7 @@ namespace GameNS {
         public void Start() {
             // Start the game
             deck.Shuffle();
-
-            Round round = new Round(players, deck);
+            this.round = new Round(players, deck);
             roundNumber++;
 
             round.giveCards();
