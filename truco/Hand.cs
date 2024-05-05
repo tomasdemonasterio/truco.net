@@ -1,10 +1,12 @@
 namespace HandNS {
     using CardNS;
+    using DeckNS;
+
     class Hand {
-        private List<Card> cards;
+        private HashSet<Card> cards;
         
         public Hand() {
-            cards = new List<Card>();
+            cards = new HashSet<Card>();
         }
 
         public void AddCard(Card card) {
@@ -15,7 +17,7 @@ namespace HandNS {
             cards.Remove(card);
         }
 
-        public List<Card> GetCards() {
+        public HashSet<Card> GetCards() {
             return cards;
         }
     }
