@@ -17,8 +17,23 @@ namespace HandNS {
             cards.Remove(index);
         }
 
-        public List<Card> GetCards() {
-            return cards.Values.ToList();
+        public Dictionary<int, Card> GetCards() {
+            return cards;
+        }
+        public Card GetCard(int index) {
+            return cards[index];
+        }
+        
+        public string toString() {
+            string result = "";
+            foreach (KeyValuePair<int, Card> entry in cards)
+            {
+                result += entry.Key + ". "  + entry.Value.getSuit() + " " + entry.Value.getNumber() + " Valor: " + entry.Value.getValue() + "\n";
+            }
+            if (result == "") {
+                result = "Empty hand";
+            }
+            return result;
         }
     }
 }
