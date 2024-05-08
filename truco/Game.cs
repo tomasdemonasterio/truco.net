@@ -2,9 +2,10 @@ namespace GameNS {
     using DeckNS;
     using PlayerNS;
     using RoundNS;
+    using RandomNS;
 
     class Game {
-        private List<Player> players;
+        public List<Player> players { get; set;}
         private Deck deck;
         private int roundNumber;
         public Round round { get; set;}
@@ -26,14 +27,15 @@ namespace GameNS {
         public void Start() {
             // Start the game
             deck.Shuffle();
-            this.round = new Round(players, deck);
+            round = new Round(players, deck);
             roundNumber++;
 
             round.giveCards();
+            int nextPlayerIndex = RandomHelper.GetRandomIndex(players.Count);
+            round.nextPlayer = players[nextPlayerIndex];
 
-            round.Start();
+            //round.Start();
         }
-
 
         public void End() {
             // End the game
