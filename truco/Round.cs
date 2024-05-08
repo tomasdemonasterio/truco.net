@@ -2,6 +2,7 @@ namespace RoundNS {
     using PlayerNS;
     using DeckNS;
     using CardNS;
+    using System.Security.Cryptography.X509Certificates;
 
     enum RoundState {
         started,
@@ -17,7 +18,7 @@ namespace RoundNS {
         Ended
     }
     class Round{
-        private List<Player> players;
+        public List<Player> playersInRound { get; set; }
         private Deck deck;
         public int roundScore { get; set;}
 
@@ -29,7 +30,7 @@ namespace RoundNS {
 
 
         public Round(List<Player> players, Deck deck){
-            this.players = players;
+            playersInRound = players;
             this.deck = deck;
             roundScore = 0;
             roundState = RoundState.started;
@@ -39,7 +40,7 @@ namespace RoundNS {
         public void giveCards() {
             int i = 0;
             while (i < 3) {
-                foreach (Player player in players) {
+                foreach (Player player in playersInRound) {
                     player.hand.AddCard(i, deck.getNextCard());
                 }
                 i++;
@@ -51,19 +52,26 @@ namespace RoundNS {
         }
         public void playedCard(Player player, Card card){
             playedCards.Add(card, player);
-            nextPlayer = players.Find(p => p.name != player.name);
+            nextPlayer = playersInRound.Find(p => p.name != player.name);
         }
 
         public void endRound(){
+            List<Player> players = playersInRound.FindAll(p => p.playerState != PlayerState.isPlayingIrseAlMazo);
             // Calcular puntos
             if (roundState == RoundState.Truco){
                 roundScore = 2;
+                Player winner = whoPlayedMostValuableCard();
+                winner.score += roundScore;
             } 
             if (roundState == RoundState.Retruco){
                 roundScore = 3;
+                Player winner = playedCards.Values.First();
+                winner.score += roundScore;
             } 
             if (roundState == RoundState.ValeCuatro){
                 roundScore = 4;
+                Player winner = playedCards.Values.First();
+                winner.score += roundScore;
             } 
             if (roundState == RoundState.Envido){
                 roundScore = 2;
@@ -73,10 +81,8 @@ namespace RoundNS {
             } else {
                 roundScore = 1;
             }
-            // Calcular ganador
-            if (roundState == RoundState.Truco || roundState == RoundState.Retruco || roundState == RoundState.ValeCuatro){
-                Player winner = playedCards.Values.First();
-                winner.score += roundScore;
+            if (roundState == RoundState.IrseAlMazo){
+                roundScore = 1;
             }
             roundState = RoundState.Ended;
         }
@@ -103,8 +109,10 @@ namespace RoundNS {
             
             public void accionCantada(Player player, List<Acciones> acciones, RoundState roundState){ {
                 this.roundState = roundState;
-                foreach (Player p in players){
+                foreach (Player p in playersInRound){
                     p.availableActions.Clear();
+                    p.availableActions.Add(Acciones.Pasar);
+                    p.availableActions.Add(Acciones.IrseAlMazo);
                     if (p != player){
                         foreach (Acciones accion in acciones){
                             p.availableActions.Add(accion);
@@ -112,6 +120,12 @@ namespace RoundNS {
                     }
                 }
             }
+        }
+
+        public void playerSeFueAlMazo(Player player){
+            // remover todas las cartas jugadas por el jugador y removerlo de la lista de jugadores
+            playedCards = playedCards.Where(p => p.Value != player).ToDictionary(p => p.Key, p => p.Value);
+            playersInRound.Remove(player);
         }
     }
 }
