@@ -1,4 +1,5 @@
 using CardNS;
+using RandomNS;
 
 namespace DeckNS {
     class Deck {
@@ -12,14 +13,14 @@ namespace DeckNS {
         }
 
         private void CreateDeck() {
-            for (int i = 1; i <= 8; i++) {
+            for (int i = 1; i < 8; i++) {
                 AddCard(new Card(Suits.Bastos, i));
                 AddCard(new Card(Suits.Copas, i));
                 AddCard(new Card(Suits.Espadas, i));
                 AddCard(new Card(Suits.Oros, i));
             }
 
-            for (int i = 10; i <=12; i++) {
+            for (int i = 10; i < 13; i++) {
                 AddCard(new Card(Suits.Bastos, i));
                 AddCard(new Card(Suits.Copas, i));
                 AddCard(new Card(Suits.Espadas, i));
@@ -47,9 +48,8 @@ namespace DeckNS {
         }
 
         public void Shuffle() {
-            Random random = new Random();
             for (int i = 0; i < this.cards.Count; i++) {
-                int randomIndex = random.Next(0, this.cards.Count);
+                int randomIndex = RandomHelper.GetRandomIndex(this.cards.Count);
                 Card temp = this.cards[i];
                 this.cards[i] = this.cards[randomIndex];
                 this.cards[randomIndex] = temp;
