@@ -1,7 +1,3 @@
-truco/bin/Debug/net7.0/truco.dll
-truco/obj/Debug/net7.0/refint/truco.dll
-truco/obj/Debug/net7.0/ref/truco.dll
-truco/obj/Debug/net7.0/truco.pdb
-truco/obj/Debug/net7.0/truco.dll
-truco/obj/Debug/net7.0/truco.csproj.CoreCompileInputs.cache
-truco/bin/Debug/net7.0/truco.pdb
+// carpeta bin y obj ignorar
+bin/
+obj/
