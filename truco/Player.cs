@@ -1,21 +1,10 @@
-namespace PlayerNS {
-    using HandNS;
-    using GameNS;
+using HandNS;
+using GameNS;
 
-    enum PlayerState {
-        isPlayingTruco,
-        isPlayingEnvido,
-        isPlayingRealEnvido,
-        isPlayingRetruco,
-        isPlayingValeCuatro,
-        isPlayingFaltaEnvido,
-        isPlayingIrseAlMazo,
-        isPlayingQuiero,
-        isPlayingPasar,
-        isPlayingStart
-    }
-
-    enum Acciones {
+namespace PlayerNS
+{
+    internal enum Acciones
+    {
         Truco,
         Envido,
         RealEnvido,
@@ -24,43 +13,47 @@ namespace PlayerNS {
         FaltaEnvido,
         IrseAlMazo,
         Quiero,
-        Pasar}
+        Pasar
+    }
 
-    class Player {
-       
-        private Game game;
-        public string name { get;}
-        public Hand hand { get;}
-        public int score { get; set; }
-        public bool isFirstWinner { get; set; }
-        public PlayerState playerState { get; set; }
-        public int phasesWon { get; set; }
-        public HashSet<Acciones> availableActions { get; set; }
+    internal class Player
+    {
+        private Game Game { get; }
+        public string Name { get; }
+        public Hand Hand { get; }
+        public int Score { get; set; }
+        public bool IsLastWinner { get; set; }
+        public int PhasesWon { get; set; }
+        public HashSet<Acciones> AvailableActions { get; set; }
+        public Acciones LastAction { get; set; }
 
-        public Player(string name, Game game) {
-            this.name = name;
-            this.game = game;
-            hand = new Hand();
-            score = 0;
-            isFirstWinner = false;
-            playerState = PlayerState.isPlayingStart;
-            phasesWon = 0;
-            availableActions = new HashSet<Acciones>() { Acciones.Truco, Acciones.Envido, Acciones.Pasar, Acciones.IrseAlMazo };
+        public Player(string name, Game game)
+        {
+            Name = name;
+            Game = game;
+            Hand = new Hand();
+            Score = 0;
+            IsLastWinner = false;
+            PhasesWon = 0;
+            AvailableActions = new HashSet<Acciones>() { Acciones.Truco, Acciones.Envido, Acciones.Pasar, Acciones.IrseAlMazo };
+            LastAction = Acciones.Pasar;
         }
 
-        public void playCard(int index) {
-            // Play card
-            game.round.playedCard(this, hand.GetCard(index));
-            hand.removeCard(index);
+        public void PlayCard(int index)
+        {
+            Game.Round?.PlayedCard(this, Hand.GetCard(index));
+            Hand.RemoveCard(index);
         }
 
-        public string playerAvailableActionsToString() {
+        public string PlayerAvailableActionsToString()
+        {
             string actions = "";
-            foreach (Acciones action in availableActions) {
+            foreach (Acciones action in AvailableActions)
+            {
                 actions += action.ToString() + " ";
             }
             return actions;
         }
-        
+
     }
 }

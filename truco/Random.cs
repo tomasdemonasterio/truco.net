@@ -2,13 +2,13 @@ namespace RandomNS
 {
     public static class RandomHelper
     {
-        private static Random random = new Random();
+        private static Random Random { get; } = new();
 
         public static int GetRandomIndex(int maxValue)
         {
-            lock(random) // Asegura que el acceso al generador de números aleatorios sea seguro en entornos multiproceso
+            lock (Random) // Asegura que el acceso al generador de números aleatorios sea seguro en entornos multiproceso
             {
-                return random.Next(0, maxValue);
+                return Random.Next(0, maxValue);
             }
         }
     }

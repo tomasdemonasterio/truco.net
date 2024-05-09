@@ -1,44 +1,62 @@
-namespace GameNS {
-    using DeckNS;
-    using PlayerNS;
-    using RoundNS;
-    using RandomNS;
+using PlayerNS;
+using RoundNS;
 
-    class Game {
-        public List<Player> players { get; set;}
-        private Deck deck;
-        private int roundNumber;
-        public Round round { get; set;}
+namespace GameNS
+{
+    internal class Game
+    {
+        public List<Player> Players { get; set; }
+        public int RoundNumber { get; set; }
+        public Round? Round { get; set; }
 
-        public Game(List<Player> players) {
-            this.players = players;
-            deck = new Deck();
-            roundNumber = 0;
+        public Game()
+        {
+            Players = new List<Player>();
+            RoundNumber = 0;
+            Round = null;
         }
 
-        public void AddPlayer(Player player) {
-            players.Add(player);
+        public void AddPlayer(Player player)
+        {
+            Players.Add(player);
         }
 
-        public void RemovePlayer(Player player) {
-            players.Remove(player);
+        public void RemovePlayer(Player player)
+        {
+            _ = Players.Remove(player);
         }
 
-        public void Start() {
+        public void StartNewRound()
+        {
             // Start the game
-            deck.Shuffle();
-            round = new Round(players, deck);
-            roundNumber++;
-
-            round.giveCards();
-            int nextPlayerIndex = RandomHelper.GetRandomIndex(players.Count);
-            round.nextPlayer = players[nextPlayerIndex];
-
-            //round.Start();
+            Round = new Round(Players);
+            Round.StartRound();
+            RoundNumber++;
         }
 
-        public void End() {
-            // End the game
+        public bool AnyPlayerGotMaxScore()
+        {
+            foreach (Player player in Players)
+            {
+                if (player.Score >= 30)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public Player GetWinner()
+        {
+            Player winner = Players[0];
+            foreach (Player player in Players)
+            {
+                if (player.Score > winner.Score)
+                {
+                    winner = player;
+                }
+            }
+            return winner;
         }
     }
 }

@@ -1,26 +1,33 @@
 using CardNS;
 using RandomNS;
 
-namespace DeckNS {
-    class Deck {
-        private List<Card> cards;
-        private int currentCardIndex;
+namespace DeckNS
+{
+    internal class Deck
+    {
+        public List<Card> Cards { get; }
 
-        public Deck() {
-            this.cards = new List<Card>();
+        public int CurrentCardIndex { get; set; }
+
+        public Deck()
+        {
+            Cards = new List<Card>();
             CreateDeck();
-            this.currentCardIndex = 0;
+            CurrentCardIndex = 0;
         }
 
-        private void CreateDeck() {
-            for (int i = 1; i < 8; i++) {
+        private void CreateDeck()
+        {
+            for (int i = 1; i < 8; i++)
+            {
                 AddCard(new Card(Suits.Bastos, i));
                 AddCard(new Card(Suits.Copas, i));
                 AddCard(new Card(Suits.Espadas, i));
                 AddCard(new Card(Suits.Oros, i));
             }
 
-            for (int i = 10; i < 13; i++) {
+            for (int i = 10; i < 13; i++)
+            {
                 AddCard(new Card(Suits.Bastos, i));
                 AddCard(new Card(Suits.Copas, i));
                 AddCard(new Card(Suits.Espadas, i));
@@ -28,31 +35,35 @@ namespace DeckNS {
             }
         }
 
-        public void AddCard(Card card) {
-            this.cards.Add(card);
+        public void AddCard(Card card)
+        {
+            Cards.Add(card);
         }
 
-        public Card getNextCard() {
-            if (this.currentCardIndex >= this.cards.Count) {
+        public Card GetNextCard()
+        {
+            if (CurrentCardIndex >= Cards.Count)
+            {
                 throw new Exception("No more cards in the deck");
             }
 
-            Card card = this.cards[this.currentCardIndex];
-            this.removeCard(this.currentCardIndex);
-            this.currentCardIndex++;
+            Card card = Cards[CurrentCardIndex];
+            RemoveCard(CurrentCardIndex);
+            CurrentCardIndex++;
             return card;
         }
 
-        public void removeCard(int index) {
-            this.cards.RemoveAt(index);
+        public void RemoveCard(int index)
+        {
+            Cards.RemoveAt(index);
         }
 
-        public void Shuffle() {
-            for (int i = 0; i < this.cards.Count; i++) {
-                int randomIndex = RandomHelper.GetRandomIndex(this.cards.Count);
-                Card temp = this.cards[i];
-                this.cards[i] = this.cards[randomIndex];
-                this.cards[randomIndex] = temp;
+        public void Shuffle()
+        {
+            for (int i = 0; i < Cards.Count; i++)
+            {
+                int randomIndex = RandomHelper.GetRandomIndex(Cards.Count);
+                (Cards[randomIndex], Cards[i]) = (Cards[i], Cards[randomIndex]);
             }
         }
     }

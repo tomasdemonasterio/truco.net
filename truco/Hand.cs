@@ -1,36 +1,39 @@
-namespace HandNS {
-    using CardNS;
-    using DeckNS;
+using CardNS;
 
-    class Hand {
-        private Dictionary<int, Card> cards;
-        
-        public Hand() {
-            cards = new Dictionary<int, Card>();
-        }
+namespace HandNS
+{
+    internal class Hand
+    {
+        public Dictionary<int, Card> Cards { get; }
 
-        public void AddCard(int index, Card card) {
-            cards.Add(index, card);
+        public Hand()
+        {
+            Cards = new Dictionary<int, Card>();
         }
 
-        public void removeCard(int index) {
-            cards.Remove(index);
+        public void AddCard(int index, Card card)
+        {
+            Cards.Add(index, card);
         }
 
-        public Dictionary<int, Card> GetCards() {
-            return cards;
+        public void RemoveCard(int index)
+        {
+            _ = Cards.Remove(index);
         }
-        public Card GetCard(int index) {
-            return cards[index];
+        public Card GetCard(int index)
+        {
+            return Cards[index];
         }
-        
-        public string toString() {
+
+        public override string ToString()
+        {
             string result = "";
-            foreach (KeyValuePair<int, Card> entry in cards)
+            foreach (KeyValuePair<int, Card> entry in Cards)
             {
-                result += entry.Key + ". "  + entry.Value.getSuit() + " " + entry.Value.getNumber() + " Valor: " + entry.Value.getValue() + "\n";
+                result += entry.Key + ". " + entry.Value.Suit + " " + entry.Value.Number + " Valor: " + entry.Value.Value + "\n";
             }
-            if (result == "") {
+            if (result == "")
+            {
                 result = "Empty hand";
             }
             return result;
