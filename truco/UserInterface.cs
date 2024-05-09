@@ -126,14 +126,12 @@ namespace UINS
                         {
                             game.Round.AccionCantada(player, Acciones.FaltaEnvido, new List<Acciones>
                             {Acciones.Quiero, Acciones.IrseAlMazo});
-                            game.Round.RoundScore = 99;
                             break;
                         }
                         if (action.Equals("irsealmazo", StringComparison.Ordinal))
                         {
                             game.Round.PlayerSeFueAlMazo(player);
                             game.Round.IsRoundEnded = true;
-                            game.Round.EndRound();
                             break;
                         }
                         if (action.Equals("quiero", StringComparison.Ordinal))
