@@ -15,6 +15,7 @@ namespace RoundNS {
         FaltaTruco,
         Quiero,
         IrseAlMazo,
+        CardPlayed,
         Ended
     }
     class Round{
@@ -47,44 +48,17 @@ namespace RoundNS {
             }
         }
         
-        public void givePoints(){
-            
-        }
         public void playedCard(Player player, Card card){
             playedCards.Add(card, player);
             nextPlayer = playersInRound.Find(p => p.name != player.name);
         }
 
         public void endRound(){
-            List<Player> players = playersInRound.FindAll(p => p.playerState != PlayerState.isPlayingIrseAlMazo);
-            // Calcular puntos
-            if (roundState == RoundState.Truco){
-                roundScore = 2;
-                Player winner = whoPlayedMostValuableCard();
+            // Calcular puntos de la ronda
+            if (roundState == RoundState.Ended){
+                Player winner = playersInRound.MaxBy(p => p.phasesWon);
                 winner.score += roundScore;
-            } 
-            if (roundState == RoundState.Retruco){
-                roundScore = 3;
-                Player winner = playedCards.Values.First();
-                winner.score += roundScore;
-            } 
-            if (roundState == RoundState.ValeCuatro){
-                roundScore = 4;
-                Player winner = playedCards.Values.First();
-                winner.score += roundScore;
-            } 
-            if (roundState == RoundState.Envido){
-                roundScore = 2;
-            } 
-            if (roundState == RoundState.RealEnvido){
-                roundScore = 3;
-            } else {
-                roundScore = 1;
             }
-            if (roundState == RoundState.IrseAlMazo){
-                roundScore = 1;
-            }
-            roundState = RoundState.Ended;
         }
 
         public Player whoPlayedMostValuableCard(){
@@ -111,12 +85,14 @@ namespace RoundNS {
                 this.roundState = roundState;
                 foreach (Player p in playersInRound){
                     p.availableActions.Clear();
-                    p.availableActions.Add(Acciones.Pasar);
-                    p.availableActions.Add(Acciones.IrseAlMazo);
+                    if (acciones.Contains(Acciones.Pasar)) {
+                        p.availableActions.Add(Acciones.Pasar);
+                    }
                     if (p != player){
                         foreach (Acciones accion in acciones){
                             p.availableActions.Add(accion);
                         }
+                        p.availableActions.Add(Acciones.IrseAlMazo);
                     }
                 }
             }
@@ -125,7 +101,17 @@ namespace RoundNS {
         public void playerSeFueAlMazo(Player player){
             // remover todas las cartas jugadas por el jugador y removerlo de la lista de jugadores
             playedCards = playedCards.Where(p => p.Value != player).ToDictionary(p => p.Key, p => p.Value);
-            playersInRound.Remove(player);
+            player.phasesWon = -1;
+            //playersInRound.Remove(player);
+        }
+
+        public void winnerOfPhase(){
+            Player winner = whoPlayedMostValuableCard();
+            if (winner == null){
+                return;
+            }
+            winner.phasesWon++;
+            playedCards.Clear();
         }
     }
 }

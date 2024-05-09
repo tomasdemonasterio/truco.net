@@ -22,7 +22,7 @@ namespace UINS
             Console.WriteLine("Round 1 started!");
             Console.WriteLine();
 
-
+            int playedCards = 0;
             while(game.round.roundState != RoundState.Ended) {
                 Console.WriteLine("Round state: " + game.round.roundState);
                 Player player = game.round.nextPlayer;
@@ -31,13 +31,19 @@ namespace UINS
                 showPlayerAvailableActions(player);
                 readAction(game);
                 game.round.nextPlayer = game.players.Find(p => p != player);
+                if (game.round.roundState == RoundState.CardPlayed) {
+                    playedCards++;
+                }
+                if (playedCards == game.round.playersInRound.Count || game.round.roundState == RoundState.Ended) {
+                    game.round.winnerOfPhase();
+                    playedCards = 0;
+                }
         }
             Console.WriteLine("Round ended!");
             foreach (Player player in game.players) {
                 Console.WriteLine(player.name + "'s score: " + player.score);
             }
     }
-
         public static void showPlayerHand(Player player)
         {
             Console.WriteLine(player.name + "'s hand:");
@@ -57,62 +63,62 @@ namespace UINS
             Player player = game.round.nextPlayer;
             Console.WriteLine(player.name + ", please enter your action:");
             while (true) {
-                    if (game.round.playersInRound.All(p => p.hand.GetCards().Count == 0)) {
-                                    game.round.endRound();
-                                    break;
+                if (game.round.playersInRound.All(p => p.hand.GetCards().Count == 0)) {
+                    game.round.roundState = RoundState.Ended;
+                    game.round.endRound();
+                    break;
+                }
+                string action = Console.ReadLine().ToLower();
+                if (Enum.TryParse(action, true, out Acciones accion)) {
+                    if (player.availableActions.Contains(accion)) {
+                        if (action.Equals("truco")) {
+                            game.round.accionCantada(player, new List<Acciones> {Acciones.Quiero, Acciones.Retruco, Acciones.IrseAlMazo}, RoundState.Truco);
+                            game.round.roundScore = 2;
+                            break;
                         }
-                    string action = Console.ReadLine();
-                    if (Enum.TryParse(action, out Acciones accion)) {
-                        if (player.availableActions.Contains(accion)) {
-                            if (action.Equals("Truco")) {
-                                game.round.accionCantada(player, new List<Acciones> {Acciones.Quiero, Acciones.Retruco, Acciones.IrseAlMazo}, RoundState.Truco);
-                                //player.playerState = PlayerState.isPlayingTruco;
-                                break;
+                        if (action.Equals("envido")) {
+                            game.round.accionCantada(player, new List<Acciones> {Acciones.Quiero, Acciones.RealEnvido, Acciones.IrseAlMazo}, RoundState.Envido);
+                            game.round.roundScore = 99;
+                            break;
                             }
-                            if (action.Equals("Envido")) {
-                                game.round.accionCantada(player, new List<Acciones> {Acciones.Quiero, Acciones.RealEnvido, Acciones.IrseAlMazo}, RoundState.Envido);
-                                //player.playerState = PlayerState.isPlayingEnvido;
-                                break;
-                            }
-                            if (action.Equals("RealEnvido")) {
+                            if (action.Equals("realenvido")) {
                                 game.round.accionCantada(player, new List<Acciones> {Acciones.Quiero, Acciones.FaltaEnvido, Acciones.IrseAlMazo}, RoundState.RealEnvido);
-                                //player.playerState = PlayerState.isPlayingRealEnvido;
+                                game.round.roundScore = 99;
                                 break;
                             }
-                            if (action.Equals("Retruco")) {
+                            if (action.Equals("retruco")) {
                                 game.round.accionCantada(player, new List<Acciones> {Acciones.Quiero, Acciones.ValeCuatro, Acciones.IrseAlMazo}, RoundState.Retruco);
-                                //player.playerState = PlayerState.isPlayingRetruco;
+                                game.round.roundScore = 3;
                                 break;
                             }
-                            if (action.Equals("ValeCuatro")) {
+                            if (action.Equals("valecuatro")) {
                                 game.round.accionCantada(player, new List<Acciones> {Acciones.Quiero, Acciones.IrseAlMazo}, RoundState.ValeCuatro);
-                                //player.playerState = PlayerState.isPlayingValeCuatro;
+                                game.round.roundScore = 4;
                                 break;
                             }
-                            if (action.Equals("FaltaEnvido")) {
+                            if (action.Equals("faltaenvido")) {
                                 game.round.accionCantada(player, new List<Acciones> {Acciones.Quiero, Acciones.IrseAlMazo}, RoundState.FaltaEnvido);
-                                //player.playerState = PlayerState.isPlayingFaltaEnvido;
+                                game.round.roundScore = 99;
                                 break;
                             }
-                            if (action.Equals("IrseAlMazo")) {
+                            if (action.Equals("irsealmazo")) {
                                 // Debe terminar la ronda TODO
                                 game.round.playerSeFueAlMazo(player);
+                                game.round.roundState = RoundState.Ended;
                                 game.round.endRound();
-                                //player.playerState = PlayerState.isPlayingIrseAlMazo;
                                 break;
                             }
-                            if (action.Equals("Quiero")) {
+                            if (action.Equals("quiero")) {
                                 // Debe terminar la ronda TODO
                                 game.round.accionCantada(player, new List<Acciones> {Acciones.Pasar, Acciones.IrseAlMazo}, RoundState.Quiero);
-                                //player.playerState = PlayerState.isPlayingQuiero;
                                 break;
                                 }
-                            if (action.Equals("Pasar")) {
+                            if (action.Equals("pasar")) {
                                 // TODO
                                 // Si todos los jugadores ya pusieron todas las cartas, terminar la ronda
                                 Console.WriteLine("Enter the card index to pass:");
                                 player.playCard(int.Parse(Console.ReadLine()));
-                                //player.playerState = PlayerState.isPlayingPasar;
+                                game.round.roundState = RoundState.CardPlayed;
                                 break;
                             }
                     }
