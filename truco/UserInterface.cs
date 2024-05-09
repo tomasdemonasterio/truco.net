@@ -95,7 +95,7 @@ namespace UINS
                         if (action.Equals("truco", StringComparison.Ordinal))
                         {
                             game.Round.AccionCantada(player, Acciones.Truco, new List<Acciones>
-                            {Acciones.Quiero, Acciones.Retruco, Acciones.IrseAlMazo});
+                            {Acciones.Quiero, Acciones.Envido, Acciones.Retruco, Acciones.IrseAlMazo});
                             break;
                         }
                         if (action.Equals("retruco", StringComparison.Ordinal))
