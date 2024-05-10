@@ -1,5 +1,8 @@
 namespace CardNS
 {
+    /// <summary>
+    /// Enumeration for the four possible suits of a card
+    /// </summary>
     public enum Suits
     {
         Espadas,
@@ -8,20 +11,50 @@ namespace CardNS
         Oros
     }
 
+    /// <summary>
+    /// Class representing a playing card
+    /// </summary>
     public class Card
     {
+        /// <summary>
+        /// Property representing the suit of the card
+        /// </summary>
         public Suits Suit { get; }
+
+        /// <summary>
+        /// Property representing the number of the card
+        /// </summary>
         public int Number { get; }
+
+        /// <summary>
+        /// Property representing the value of the card in the game of Truco
+        /// </summary>
         public int Value { get; }
+
+        /// <summary>
+        /// Constructor for the Card class
+        /// </summary>
+        /// <param name="suit">The suit of the card</param>
+        /// <param name="number">The number of the card</param>
         public Card(Suits suit, int number)
         {
             Suit = suit;
             Number = number;
             Value = DetermineValue();
         }
+
+        public override string ToString()
+        {
+            return Suit + " " + Number + " Valor: " + Value + "\n";
+        }
+
+        /// <summary>
+        /// Method to determine the value of the card based on its number and suit
+        /// </summary>
+        /// <returns>The value of the card according to the rules of Truco</returns>
         public int DetermineValue()
         {
-            // asignar valor segun el truco
+            // Assign value according to the rules of Truco
             int cardValue = 0;
             if (Number == 1)
             {

@@ -3,29 +3,35 @@ using DeckNS;
 using CardNS;
 using RandomNS;
 
+/// <summary>
+/// The <c>RoundNS</c> namespace contains classes related to managing rounds in a card game.
+/// </summary>
 namespace RoundNS
 {
     internal class Round
     {
         public List<Player> PlayersInRound { get; set; }
         private Deck Deck { get; }
-        public int RoundScore { get; set; }
-
+        public int TrucoScore { get; set; }
+        public int EnvidoScore { get; set; }
         private Dictionary<Card, Player> PlayedCards { get; set; }
-
         public Player? PlayerTurn { get; set; }
-
         public bool IsRoundEnded { get; set; }
+        public bool EnvidoCantado { get; set; }
+        public bool TrucoCantado { get; set; }
 
 
         public Round(List<Player> players)
         {
             PlayersInRound = players;
             Deck = new();
-            RoundScore = 1;
+            TrucoScore = 1;
+            EnvidoScore = 0;
             IsRoundEnded = false;
             PlayedCards = new Dictionary<Card, Player>();
             PlayerTurn = null;
+            EnvidoCantado = false;
+            TrucoCantado = false;
         }
 
         public void GiveCards()
@@ -50,29 +56,44 @@ namespace RoundNS
         public void StartRound()
         {
             // Iniciar la ronda
+            foreach (Player player in PlayersInRound)
+                {
+                    player.PrepareForNewRound();
+                }
             PlayerTurn = PlayersInRound[RandomHelper.GetRandomIndex(PlayersInRound.Count)];
             PlayerTurn.IsLastWinner = true;
             Deck.Shuffle();
             GiveCards();
+            foreach (Player player in PlayersInRound)
+            {
+                player.Hand.CalculateEnvidoTotalValue();
+            }
         }
 
         public void EndRound()
         {
             if (IsRoundEnded)
             {
-                Player? winner = PlayersInRound.MaxBy(static p => p.PhasesWon);
-                if (winner != null)
+                Player? trucoWinner = PlayersInRound.MaxBy(static p => p.PhasesWon);
+                if (trucoWinner != null)
                 {
-                    winner.Score += RoundScore;
+                    trucoWinner.Score += TrucoScore;
+
                 }
-                foreach (Player player in PlayersInRound)
+                Player? envidoWinner = WhoWonEnvido();
+                if (envidoWinner != null)
                 {
-                    player.PhasesWon = 0;
-                    player.LastAction = Acciones.Pasar;
-                    player.Hand.Cards.Clear();
-                    player.AvailableActions = new HashSet<Acciones>() { Acciones.Truco, Acciones.Envido, Acciones.Pasar, Acciones.IrseAlMazo };
+                    envidoWinner.Score += EnvidoScore;
                 }
             }
+        }
+
+        public Player WhoWonEnvido()
+        {
+            int maxEnvidoValue = PlayersInRound.Max(static p => p.Hand.EnvidoTotalValue);
+            List<Player> playersWithMaxEnvidoValue = PlayersInRound.Where(p => p.Hand.EnvidoTotalValue == maxEnvidoValue).ToList();
+            return playersWithMaxEnvidoValue.Count > 1
+                ?  null : playersWithMaxEnvidoValue[0];
         }
 
         public Player WhoPlayedMostValuableCard()
@@ -90,23 +111,41 @@ namespace RoundNS
         public void AccionCantada(Player player, Acciones Action, List<Acciones> acciones)
         {
             {
+                if (Action == Acciones.Truco)
+                {
+                    TrucoCantado = true;
+                }
+                if (Action == Acciones.Envido)
+                {
+                    EnvidoCantado = true;
+                }
+                if (EnvidoCantado) 
+                {
+                    acciones.Remove(Acciones.Envido);
+                }
+                if (TrucoCantado) 
+                {
+                    acciones.Remove(Acciones.Truco);
+                    acciones.Remove(Acciones.Envido);
+                }
                 player.LastAction = Action;
                 RoundScoreCalculation();
+
                 foreach (Player p in PlayersInRound)
                 {
                     p.AvailableActions.Clear();
-                    if (acciones.Contains(Acciones.Pasar))
+                    _ = p.AvailableActions.Add(Acciones.IrseAlMazo);
+                    if (acciones.Contains(Acciones.Pasar) && !PlayedCards.Any(p2 => p2.Value == p))
                     {
                         _ = p.AvailableActions.Add(Acciones.Pasar);
-                        _ = p.AvailableActions.Add(Acciones.IrseAlMazo);
                     }
-                    if (p != player)
-                    {
-                        foreach (Acciones accion in acciones)
+
+                    foreach (Acciones accion in acciones)
+                    {   
+                        if (accion != Acciones.Pasar)
                         {
                             _ = p.AvailableActions.Add(accion);
                         }
-                        _ = p.AvailableActions.Add(Acciones.IrseAlMazo);
                     }
                 }
             }
@@ -130,6 +169,13 @@ namespace RoundNS
             winner.PhasesWon++;
             PlayedCards.Clear();
             PlayerTurn = winner;
+            foreach (Player player in PlayersInRound)
+            {
+                if (!player.AvailableActions.Contains(Acciones.Pasar))
+                {
+                    _ = player.AvailableActions.Add(Acciones.Pasar);
+                }
+            }
 
             if (PlayersInRound.Any(static p => p.PhasesWon == 2))
             {
@@ -141,45 +187,45 @@ namespace RoundNS
         private void RoundScoreCalculation()
         {
             // Calcular puntos de la ronda
-            if (PlayersInRound.Any(static p => p.LastAction == Acciones.Truco) 
-                && (PlayersInRound.Any(static p => p.LastAction == Acciones.Quiero) 
+            if (PlayersInRound.Any(static p => p.LastAction == Acciones.Truco)
+                && (PlayersInRound.Any(static p => p.LastAction == Acciones.QuieroTruco)
                 || PlayersInRound.Any(static p => p.LastAction == Acciones.Retruco)))
             {
-                RoundScore = 2;
+                TrucoScore = 2;
                 return;
             }
-            if (PlayersInRound.Any(static p => p.LastAction == Acciones.Retruco) 
-                && (PlayersInRound.Any(static p => p.LastAction == Acciones.Quiero) 
+            if (PlayersInRound.Any(static p => p.LastAction == Acciones.Retruco)
+                && (PlayersInRound.Any(static p => p.LastAction == Acciones.QuieroTruco)
                 || PlayersInRound.Any(static p => p.LastAction == Acciones.ValeCuatro)))
             {
-                RoundScore = 3;
+                TrucoScore = 3;
                 return;
             }
-            if (PlayersInRound.Any(static p => p.LastAction == Acciones.ValeCuatro) 
-                && PlayersInRound.Any(static p => p.LastAction == Acciones.Quiero))
+            if (PlayersInRound.Any(static p => p.LastAction == Acciones.ValeCuatro)
+                && PlayersInRound.Any(static p => p.LastAction == Acciones.QuieroTruco))
             {
-                RoundScore = 4;
+                TrucoScore = 4;
                 return;
             }
             // Envido
-            if (PlayersInRound.Any(static p => p.LastAction == Acciones.Envido) 
-                && (PlayersInRound.Any(static p => p.LastAction == Acciones.Quiero) 
+            if (PlayersInRound.Any(static p => p.LastAction == Acciones.Envido)
+                && (PlayersInRound.Any(static p => p.LastAction == Acciones.QuieroTruco)
                 || PlayersInRound.Any(static p => p.LastAction == Acciones.RealEnvido)))
             {
-                RoundScore = 2;
+                EnvidoScore = 2;
                 return;
             }
-            if (PlayersInRound.Any(static p => p.LastAction == Acciones.RealEnvido) 
-                && (PlayersInRound.Any(static p => p.LastAction == Acciones.Quiero) 
+            if (PlayersInRound.Any(static p => p.LastAction == Acciones.RealEnvido)
+                && (PlayersInRound.Any(static p => p.LastAction == Acciones.QuieroTruco)
                 || PlayersInRound.Any(static p => p.LastAction == Acciones.FaltaEnvido)))
             {
-                RoundScore = 3;
+                EnvidoScore = 3;
                 return;
             }
-            if (PlayersInRound.Any(static p => p.LastAction == Acciones.FaltaEnvido) 
-                && PlayersInRound.Any(static p => p.LastAction == Acciones.Quiero))
+            if (PlayersInRound.Any(static p => p.LastAction == Acciones.FaltaEnvido)
+                && PlayersInRound.Any(static p => p.LastAction == Acciones.QuieroTruco))
             {
-                RoundScore = 30 - PlayersInRound.Max(static p => p.Score);
+                EnvidoScore = 30 - PlayersInRound.Max(static p => p.Score);
                 return;
             }
         }
